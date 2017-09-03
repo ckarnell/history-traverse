@@ -12,6 +12,10 @@
 " Variables
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" These can be added to your statusline for 'browser like' back/forward indicators:
+" set statusline+=%{w:current_buffer_index!=0?'←':'\ '} " Back history indicator
+" set statusline+=%{w:current_buffer_index<(len(w:buffer_history_list)-1)?'→':'\ '} " Forward history indicator
+
 " Globals
 let g:HISTORY_MESSAGE_ENUMS = {
       \   'NO_PREV_FILE': 'No previous file!',
@@ -20,14 +24,13 @@ let g:HISTORY_MESSAGE_ENUMS = {
       \ }
 let g:history_filetypes_to_ignore = ['netrw', 'pyc',]
 let g:buffer_history_max_len = 100
-let g:skip_add_buffer_history_list = 0 " Boolean
 let g:buffer_history_list = []
-let g:previous_buffer_index = -1
+let g:current_buffer_index = -1
 
 " Window scope
 let w:skip_add_buffer_history_list = 0 " Boolean
 let w:buffer_history_list = []
-let w:previous_buffer_index = -1
+let w:current_buffer_index = -1
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -36,18 +39,18 @@ let w:previous_buffer_index = -1
 
 " Set up the w:window_created variable when vim is launched
 autocmd VimEnter * autocmd WinEnter * let w:window_created=1
+
 " WinEnter doesn't fire on the first window created when Vim launches
 autocmd VimEnter * let w:window_created=1
-
 autocmd WinEnter *
       \ if !exists('w:window_created') |
       \   let w:window_created = 1 |
-      \   let w:skip_add_buffer_history_list = g:skip_add_buffer_history_list |
       \   let w:buffer_history_list = g:buffer_history_list |
-      \   let w:previous_buffer_index = g:previous_buffer_index |
+      \   let w:current_buffer_index = g:current_buffer_index |
+      \   let w:skip_add_buffer_history_list = 0 " Boolean
       \ endif
 
-autocmd BufLeave * if index(g:history_filetypes_to_ignore, &ft) < 0 |
+autocmd BufReadPost * |
       \ call AddToBufferHistoryList(expand('%:p')) |
       \ call UpdateHistoryGlobals()
 
@@ -57,80 +60,69 @@ autocmd BufLeave * if index(g:history_filetypes_to_ignore, &ft) < 0 |
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! UpdateHistoryGlobals()
-  let g:skip_add_buffer_history_list = w:skip_add_buffer_history_list
   let g:buffer_history_list = w:buffer_history_list
-  let g:previous_buffer_index = w:previous_buffer_index
+  let g:current_buffer_index = w:current_buffer_index
 endfunction
 
-function! AddToBufferHistoryList(last_buffer_name)
-  " Don't add empty strings to the list
-  if (w:skip_add_buffer_history_list || !len(a:last_buffer_name))
+" This function is agnostic to the current history index, and is idempotent
+" TODO: Take care of all duplicate cases
+function! AddToBufferHistoryList(buffer_name)
+  " Don't add empty strings to the list, or add to the list at
+  " all if our skip flag is set
+  if (w:skip_add_buffer_history_list || !len(a:buffer_name))
+    return
+  endif
+  " Don't append the same name that was last added to the list
+  if (len(w:buffer_history_list) && w:buffer_history_list[-1] == a:buffer_name)
     return
   endif
 
-  " Slice buffer_history_list to be one less than the previous_buffer_index value,
-  " to effectively start a new 'forward' history
-  if w:previous_buffer_index != len(w:buffer_history_list) - 1
-    if w:previous_buffer_index == -1
-      " There is no slice that creates an empty list, so we need a special case
-      " for this
-      let w:buffer_history_list = []
-    else
-      let w:buffer_history_list = w:buffer_history_list[0:w:previous_buffer_index]
-    endif
-  endif
+  " Slice the history list to start a new 'forward' history
+  let w:buffer_history_list = w:buffer_history_list[:w:current_buffer_index]
 
-  call add(w:buffer_history_list, a:last_buffer_name)
-  " Should be able to just increment this variable, but I'll put a check in
-  " so I can uncover some bugs if there are any
-  let w:previous_buffer_index = w:previous_buffer_index + 1
-  if w:previous_buffer_index != len(w:buffer_history_list) - 1
-    echo g:HISTORY_MESSAGE_ENUMS['INDEX_HISTORY_LIST_MISMATCH']
-    let w:previous_buffer_index = len(w:buffer_history_list) - 1
-  endif
+  " Finally, append the new name and increment the index value
+  call add(w:buffer_history_list, a:buffer_name)
+  let w:current_buffer_index = w:current_buffer_index + 1
 
   " If the list has become too long, chop off the beginning of it to meet the max length.
-  " Note that this can't occur
+  " Note that this can't occur when the index is 0, avoiding an index error
   if len(w:buffer_history_list) > g:buffer_history_max_len
     let w:buffer_history_list = w:buffer_history_list[-g:buffer_history_max_len:]
+      let w:current_buffer_index = w:current_buffer_index - 1
   endif
 endfunction
 
+
 function! GoBack()
-  if !len(w:buffer_history_list) || w:previous_buffer_index < 0
+  if len(w:buffer_history_list) == 1 || w:current_buffer_index == 0
     echo g:HISTORY_MESSAGE_ENUMS['NO_PREV_FILE']
     return
   endif
 
-  " Add the current buffer to the list only if the history index is at
-  " the tail of the list
-  if w:previous_buffer_index == len(w:buffer_history_list) - 1
-    call add(w:buffer_history_list, expand('%:p'))
-  endif
-
-  " Set a variable to let the autocmd skip adding onto the history list
+  " Decrement the history index
+  let w:current_buffer_index = w:current_buffer_index - 1
+  " Set a flag to prevent the autocmd from adding this buffer to the history list
   let w:skip_add_buffer_history_list = 1
   " Go BACK IN TIME!
-  execute ":e " . w:buffer_history_list[w:previous_buffer_index]
-  " Going back in time means we can go forward in time one more than before!
+  execute ":e " . w:buffer_history_list[w:current_buffer_index]
   let w:skip_add_buffer_history_list = 0
-  " Decrement the history index
-  let w:previous_buffer_index = w:previous_buffer_index - 1
 endfunction
 
 function! GoForward()
   " Skip with a friendly message if we're at the tail of the list
-  if w:previous_buffer_index >= len(w:buffer_history_list) - 2
+  if w:current_buffer_index >= len(w:buffer_history_list) - 1
+    " Set this just to restore a nice state
+    let w:current_buffer_index = len(w:buffer_history_list) - 1
     echo g:HISTORY_MESSAGE_ENUMS['NO_NEXT_FILE']
     return
   endif
 
   " Increment the history index
-  let w:previous_buffer_index = w:previous_buffer_index + 1
+  let w:current_buffer_index = w:current_buffer_index + 1
   " Set a variable to let the autocmd skip adding onto the history list
   let w:skip_add_buffer_history_list = 1
   " Go FORWARD IN TIME!
-  execute ":e " . w:buffer_history_list[w:previous_buffer_index + 1]
+  execute ":e " . w:buffer_history_list[w:current_buffer_index]
   let w:skip_add_buffer_history_list = 0
 endfunction
 
@@ -151,11 +143,15 @@ nnoremap <silent> <c-m> :call GoBack()<Enter>
 " Debugging function - this can be safely deleted
 function! Check()
   echo 'Globals:'
-  echo g:previous_buffer_index
+  echo 'Buffer index:'
+  echo g:current_buffer_index
   echo g:buffer_history_list
+  echo 'List length'
   echo len(g:buffer_history_list)
   echo 'Window locals:'
-  echo w:previous_buffer_index
+  echo 'Buffer index:'
+  echo w:current_buffer_index
   echo w:buffer_history_list
+  echo 'List length'
   echo len(w:buffer_history_list)
 endfunction
