@@ -1,7 +1,7 @@
 let g:skip_bufenter_autocmd = 0 " Boolean
 let g:buffer_history_list = []
 let g:previous_buffer_index = -1
-let g:buffer_history_max_len = 100 " TODO: Implement usage
+let g:buffer_history_max_len = 100
 let g:history_status_line_indicator = "<-"
 let g:ERROR_ENUMS = {
       \   'NO_PREV_FILE': 'No previous file!',
