@@ -42,24 +42,25 @@ autocmd VimEnter * autocmd WinEnter * let w:window_created=1
 
 " WinEnter doesn't fire on the first window created when Vim launches
 autocmd VimEnter * let w:window_created=1
+
 autocmd WinEnter *
       \ if !exists('w:window_created') |
       \   let w:window_created = 1 |
       \   let w:buffer_history_list = g:buffer_history_list |
       \   let w:current_buffer_index = g:current_buffer_index |
-      \   let w:skip_add_buffer_history_list = 0 " Boolean
+      \   let w:skip_add_buffer_history_list = 0 |
       \ endif
 
-autocmd BufReadPost * |
-      \ call AddToBufferHistoryList(expand('%:p')) |
-      \ call UpdateHistoryGlobals()
+autocmd WinLeave * call PersistLocalHistoryToGlobal()
+
+autocmd BufReadPost * call AddToBufferHistoryList(expand('%:p'))
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Functions
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! UpdateHistoryGlobals()
+function! PersistLocalHistoryToGlobal()
   let g:buffer_history_list = w:buffer_history_list
   let g:current_buffer_index = w:current_buffer_index
 endfunction
