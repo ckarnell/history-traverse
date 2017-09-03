@@ -94,7 +94,7 @@ function! AddToBufferHistoryList(buffer_name)
 endfunction
 
 
-function! GoBack()
+function! HistoryGoBack()
   if len(w:buffer_history_list) == 1 || w:current_buffer_index == 0
     echo g:HISTORY_MESSAGE_ENUMS['NO_PREV_FILE']
     return
@@ -109,7 +109,7 @@ function! GoBack()
   let w:skip_add_buffer_history_list = 0
 endfunction
 
-function! GoForward()
+function! HistoryGoForward()
   " Skip with a friendly message if we're at the tail of the list
   if w:current_buffer_index >= len(w:buffer_history_list) - 1
     " Set this just to restore a nice state
@@ -133,8 +133,8 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " This is the MEAT!
-nnoremap <silent> <c-n> :call GoForward()<Enter>
-nnoremap <silent> <c-m> :call GoBack()<Enter>
+nnoremap <silent> <c-m> :call HistoryGoBack()<Enter>
+nnoremap <silent> <c-n> :call HistoryGoForward()<Enter>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

@@ -53,46 +53,46 @@ Execute ('does not grow above the max history len value'):
   Assert w:buffer_history_list == ['test_2', 'test_3']
   Assert w:current_buffer_index == 1
 
-# Describe GoBack()
+# Describe HistoryGoBack()
 Execute ('can go back from the end of the list'):
   :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
   :let w:current_buffer_index = 3
-  :call GoBack()
+  :call HistoryGoBack()
   Assert w:buffer_history_list == ['test_1', 'test_2', 'test_3', 'test_4']
   Assert w:current_buffer_index == 2
 
 Execute ('does not go back when the index is 0'):
   :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
   :let w:current_buffer_index = 0
-  :call GoBack()
+  :call HistoryGoBack()
   Assert w:buffer_history_list == ['test_1', 'test_2', 'test_3', 'test_4']
   Assert w:current_buffer_index == 0
 
 Execute ('does not decrement the index when the history list only has one entry'):
   :let w:buffer_history_list = ['test_1']
   :let w:current_buffer_index = 0
-  :call GoBack()
+  :call HistoryGoBack()
   Assert w:buffer_history_list == ['test_1']
   Assert w:current_buffer_index == 0
 
-# Describe GoForward()
+# Describe HistoryGoForward()
 Execute ('does not go forward when the index is at the head of the list'):
   :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
   :let w:current_buffer_index = 3
-  :call GoForward()
+  :call HistoryGoForward()
   Assert w:buffer_history_list == ['test_1', 'test_2', 'test_3', 'test_4']
   Assert w:current_buffer_index == 3
 
 Execute ('increments the index when it is not at the head of the list'):
   :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
   :let w:current_buffer_index = 2
-  :call GoForward()
+  :call HistoryGoForward()
   Assert w:buffer_history_list == ['test_1', 'test_2', 'test_3', 'test_4']
   Assert w:current_buffer_index == 3
 
 Execute ('resets the state of the index when it is too high'):
   :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
   :let w:current_buffer_index = 100
-  :call GoForward()
+  :call HistoryGoForward()
   Assert w:buffer_history_list == ['test_1', 'test_2', 'test_3', 'test_4']
   Assert w:current_buffer_index == 3
