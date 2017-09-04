@@ -4,19 +4,19 @@ let s:HISTORY_MESSAGE_ENUMS = {
       \ }
 let s:skip_add_buffer_history_list = 0 " Boolean
 let s:buffer_history_list = []
-let s:current_buffer_index = -1
+let s:current_buffer_index = 0
 
 function! history_traverse#InitializeWindowSettings() abort
   if exists('w:window_created') |
     return
   endif
-  let w:window_created = 1 |
-  let w:buffer_history_list = s:buffer_history_list |
-  let w:current_buffer_index = s:current_buffer_index |
-  let s:skip_add_buffer_history_list = 0 |
+  let w:window_created = 1
+  let w:buffer_history_list = s:buffer_history_list
+  let w:current_buffer_index = s:current_buffer_index
+  let s:skip_add_buffer_history_list = 0
 endfunction
 
-function! history_traverse#PersistLocalHistoryToGlobal() abort
+function! history_traverse#PersistLocalHistoryToScriptScope() abort
   let s:buffer_history_list = w:buffer_history_list
   let s:current_buffer_index = w:current_buffer_index
 endfunction
@@ -24,8 +24,13 @@ endfunction
 " This function is agnostic to the current history index, and is idempotent
 " TODO: Take care of all duplicate cases
 function! history_traverse#AddToBufferHistoryList(buffer_name) abort
+  " TODO: Needs a test! Or a better implementation and a test
+  " Cover the case where vim was launched without a buffer loaded
+  if (!len(w:buffer_history_list) && w:current_buffer_index == 0)
+    let w:current_buffer_index = -1
+  endif
   " Don't add empty strings to the list, or add to the list at
-  " all if our skip flag is set
+  " if the skip flag is set
   if (s:skip_add_buffer_history_list || !len(a:buffer_name))
     return
   endif
@@ -51,7 +56,8 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
 endfunction
 
 function! history_traverse#HistoryGoBack() abort
-  if len(w:buffer_history_list) == 1 || w:current_buffer_index == 0
+  " Skip if we're at the head of the list
+  if len(w:buffer_history_list) <= 1 || w:current_buffer_index == 0
     echo s:HISTORY_MESSAGE_ENUMS['NO_PREV_FILE']
     return
   endif
@@ -66,7 +72,13 @@ function! history_traverse#HistoryGoBack() abort
 endfunction
 
 function! history_traverse#HistoryGoForward() abort
-  " Skip with a friendly message if we're at the tail of the list
+  " Skip if vim has just been launched with no buffer loaded
+  if !len(w:buffer_history_list)
+    echo s:HISTORY_MESSAGE_ENUMS['NO_NEXT_FILE']
+    return
+  endif
+
+  " Skip if we're at the tail of the list
   if w:current_buffer_index >= len(w:buffer_history_list) - 1
     " Set this just to restore a nice state
     let w:current_buffer_index = len(w:buffer_history_list) - 1

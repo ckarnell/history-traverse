@@ -1,11 +1,8 @@
+" TODO: Make this guard useful
 if exists('g:history_traverse_loaded')
   finish
 endif
 let g:history_traverse_loaded = 1
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Variables
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Global scope (user settings)
 if !exists('g:history_ft_ignore')   | let g:history_ft_ignore = ['netrw'] | endif

@@ -1,0 +1,7 @@
+# With the vader plugin installed, type ":Vader %" to run these tests
+
+# Describe VimEnter
+Execute ('sets initial variable on VimEnter'):
+  :let  w:window_created=1000 " Random number that isn't 1
+  :doautocmd history_group VimEnter %
+  AssertEqual w:window_created, 1
