@@ -18,6 +18,9 @@ augroup history_group
   " Before you leave a window, persist its state to the script scope variables
   autocmd WinLeave * call history_traverse#PersistLocalHistoryToScriptScope()
 
+  " Command window specific (fixes an error when you press <c-f> in command mode)
+  autocmd CmdwinEnter * call history_traverse#InitializeWindowSettings()
+
   " autocmd BufReadPost * if index(g:history_ft_ignore, &ft) < 0 |
   autocmd BufWinEnter * if index(g:history_ft_ignore, &ft) < 0 |
         \ call history_traverse#AddToBufferHistoryList(expand('%:p'))
