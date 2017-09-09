@@ -3,6 +3,7 @@ let s:HISTORY_MESSAGE_ENUMS = {
       \   'NO_NEXT_FILE': 'No next file!',
       \ }
 let s:skip_add_buffer_history_list = 0 " Boolean
+let s:bufwinenter_flag = 0
 let s:buffer_history_list = []
 let s:current_buffer_index = 0
 
@@ -21,20 +22,18 @@ function! history_traverse#PersistLocalHistoryToScriptScope() abort
   let s:current_buffer_index = w:current_buffer_index
 endfunction
 
-" This function is agnostic to the current history index, and is idempotent
 " TODO: Take care of all duplicate cases
-let s:buf_win_enter_flag = 0
+" This function is agnostic to the current history index, and is idempotent
 function! history_traverse#AddToBufferHistoryList(buffer_name) abort
-  " TODO: Needs a test! Or a better implementation and a test
   " Cover the case where vim was launched without a buffer loaded
   if (!len(w:buffer_history_list) && w:current_buffer_index == 0)
     let w:current_buffer_index = -1
   endif
   " Try the flag
-  if !s:buf_win_enter_flag
-    let s:buf_win_enter_flag = 1
+  if !s:bufwinenter_flag
+    let s:bufwinenter_flag = 1
   else
-    let s:buf_win_enter_flag = 0
+    let s:bufwinenter_flag = 0
     return
   endif
   " Don't add empty strings to the list, or add to the list at
@@ -42,11 +41,6 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
   if (s:skip_add_buffer_history_list || !len(a:buffer_name))
     return
   endif
-
-  " Don't append the same name that was last added to the list
-  " if (len(w:buffer_history_list) && w:buffer_history_list[-1] == a:buffer_name)
-  "   return
-  " endif
 
   " Slice the history list to start a new 'forward' history
   let w:buffer_history_list = w:buffer_history_list[:w:current_buffer_index]
@@ -59,7 +53,7 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
   " Note that this can't occur when the index is 0, avoiding an index error
   if len(w:buffer_history_list) > g:history_max_len
     let w:buffer_history_list = w:buffer_history_list[-g:history_max_len:]
-      let w:current_buffer_index = w:current_buffer_index - 1
+    let w:current_buffer_index = w:current_buffer_index - 1
   endif
 endfunction
 

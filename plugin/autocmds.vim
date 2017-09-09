@@ -1,8 +1,4 @@
 augroup history_group
-  " TODO: Delete? Doesn't seem necessary
-  " Set up the w:window_created variable when vim is launched
-  " autocmd VimEnter * autocmd WinEnter * let w:window_created=1
-
   " WinEnter doesn't fire on the first window created when Vim launches.
   " Set the buffer index to 0 if vim is launched without a buffer loaded
   " to prevent bugs caused by the index being -1
@@ -21,7 +17,6 @@ augroup history_group
   " Command window specific (fixes an error when you press <c-f> in command mode)
   autocmd CmdwinEnter * call history_traverse#InitializeWindowSettings()
 
-  " autocmd BufReadPost * if index(g:history_ft_ignore, &ft) < 0 |
   autocmd BufWinEnter * if index(g:history_ft_ignore, &ft) < 0 |
         \ call history_traverse#AddToBufferHistoryList(expand('%:p'))
 augroup END
