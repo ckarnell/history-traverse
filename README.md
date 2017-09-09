@@ -10,7 +10,23 @@ Easily go back and forth in your buffer history in vim, similar to the behavior 
 
 Each window (i.e. split) gets its own personal history, and each time you create a new window or a new tab, it inherits its history from the previous buffer (both forward and backward). If you're curious about the behavior of the history list, I basically made it to act the same way as a web browser's forward/backward buttons.
 
+# Usage
+
 The default mappings are `<c-m>` to go back to the most previous buffer, and `<c-n>` to go to the next. Both of these mappings can be easily changed (see settings below). Note that the `<c-m>` default will also override your carriage return mapping so you'll want to change that if you use `<cr>` for something else (see settings below).
+
+# Settings
+```vim
+" Put these in your .vimrc (all are optional):
+
+" Use this setting to override the default mapping (<c-m>) for going back in the history
+let g:history_back_map = '<c-m>'
+" Use this setting to override the default mapping (<c-n>) for going forward in the history
+let g:history_forward_map = '<c-n>'
+" Set filetypes to pass over putting in the history. Defaults to ['netrw']
+let g:history_ft_ignore = ['pyc', 'netrw']
+" Set the maximum length of each buffers history. Defaults to 100
+let g:history_max_len = 1000
+```
 
 # Installation
 Install with your favorite package manager. For the sake of completion, I'll give step by step instructions for installing with [vundle](https://github.com/VundleVim/Vundle.vim).
@@ -29,19 +45,5 @@ set statusline+=%{w:current_buffer_index!=0?'←':'\ '}
 set statusline+=%{w:current_buffer_index<(len(w:buffer_history_list)-1)?'→':'\ '}
 ```
 
-# Settings
-```vim
-" Put these in your .vimrc (all are optional):
-
-" Use this setting to override the default mapping (<c-m>) for going back in the history
-let g:history_back_map = '<c-m>'
-" Use this setting to override the default mapping (<c-n>) for going forward in the history
-let g:history_forward_map = '<c-n>'
-" Set filetypes to pass over putting in the history. Defaults to ['netrw']
-let g:history_ft_ignore = ['pyc', 'netrw']
-" Set the maximum length of each buffers history. Defaults to 100
-let g:history_max_len = 1000
-```
-
-# Lastly
-I don't really know how to make vim plugins so if you want to review my code, make suggestions about defaults or extensions, let me know about issues, or anything else, please go right ahead.
+# Shameless begging for help
+I don't really know how to make vim plugins so if you want to review my code, make suggestions about defaults or extensions, let me know about issues, help me make it more clear exactly what this plugin does in this README, or anything else, please go right ahead.
