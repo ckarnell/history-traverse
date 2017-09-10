@@ -12,7 +12,7 @@ Each window (i.e. split) gets its own personal history, and each time you create
 
 # Usage
 
-The default mappings are `<c-m>` to go back to the most previous buffer, and `<c-n>` to go to the next. Both of these mappings can be easily changed (see settings below). Note that the `<c-m>` default will also override your carriage return mapping so you'll want to change that if you use `<cr>` for something else (see settings below).
+The default mappings are `<c-m>` to go back to the most previous buffer, and `<c-n>` to go to the next. Both of these mappings can be easily changed. Note that the `<c-m>` default will also override your carriage return mapping so you'll want to change that if you use `<cr>` for something else.
 
 # Settings
 ```vim
