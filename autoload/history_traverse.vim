@@ -36,9 +36,9 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
     let s:bufwinenter_flag = 0
     return
   endif
-  " Don't add empty strings to the list, or add to the list at
+  " Don't add empty strings to the list, or add to the list at all
   " if the skip flag is set
-  if (s:skip_add_buffer_history_list || !len(a:buffer_name))
+  if (!len(a:buffer_name) || s:skip_add_buffer_history_list)
     return
   endif
 
