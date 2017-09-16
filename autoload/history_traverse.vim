@@ -29,13 +29,6 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
   if (!len(w:buffer_history_list) && w:current_buffer_index == 0)
     let w:current_buffer_index = -1
   endif
-  " Try the flag
-  if !s:bufwinenter_flag
-    let s:bufwinenter_flag = 1
-  else
-    let s:bufwinenter_flag = 0
-    return
-  endif
   " Don't add empty strings to the list, or add to the list at all
   " if the skip flag is set
   if (!len(a:buffer_name) || s:skip_add_buffer_history_list)

@@ -1,23 +1,15 @@
 # With the vader plugin installed, type ":Vader %" to run these tests
 
-# NOTE: Due to an autocmd getting called twice in the current implementation,
-# I set a flag in AddToBufferHistoryList to only execute the adding logic once
-# every other time it is called. Because of this, every test that uses
-# AddToBufferHistoryList must call it twice before making assertions.
-# TODO: Get around this somehow.
-
 # Describe history_traverse#AddToBufferHistoryList()
 Execute ('can add to the history list when it is empty'):
   :let g:history_max_len = 100
   :let w:buffer_history_list = []
-  :call history_traverse#AddToBufferHistoryList('test_string')
   :call history_traverse#AddToBufferHistoryList('test_string')
   AssertEqual w:buffer_history_list, ['test_string']
 
 Execute ('can add to the history list when it is not empty'):
   :let g:history_max_len = 100
   :let w:buffer_history_list = ['test_1']
-  :call history_traverse#AddToBufferHistoryList('test_string')
   :call history_traverse#AddToBufferHistoryList('test_string')
   AssertEqual w:buffer_history_list, ['test_1', 'test_string']
 
@@ -26,14 +18,12 @@ Execute ('does not add an empty string to the history list'):
   :let g:history_max_len = 100
   :let g:buffer_history_list = ['test_in']
   :call history_traverse#AddToBufferHistoryList('')
-  :call history_traverse#AddToBufferHistoryList('')
   AssertEqual g:buffer_history_list, ['test_in']
 
 Execute ('increments the current buffer index when the buffer history list gets bigger'):
   :let g:history_max_len = 100
   :let w:buffer_history_list = ['test_1', 'test_2', 'test_3']
   :let w:current_buffer_index = 2
-  :call history_traverse#AddToBufferHistoryList('test_4')
   :call history_traverse#AddToBufferHistoryList('test_4')
   AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
   AssertEqual w:current_buffer_index, 3
@@ -44,7 +34,6 @@ Execute ('chops off the end of the list if the current buffer index is not on th
   :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
   :let w:current_buffer_index = 1
   :call history_traverse#AddToBufferHistoryList('test_5')
-  :call history_traverse#AddToBufferHistoryList('test_5')
   AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_5']
   AssertEqual w:current_buffer_index, 2
 
@@ -52,7 +41,6 @@ Execute ('does not grow above the max history len value'):
   :let g:history_max_len = 2
   :let w:buffer_history_list = ['test_1', 'test_2']
   :let w:current_buffer_index = 1
-  :call history_traverse#AddToBufferHistoryList('test_3')
   :call history_traverse#AddToBufferHistoryList('test_3')
   AssertEqual w:buffer_history_list, ['test_2', 'test_3']
   AssertEqual w:current_buffer_index, 1

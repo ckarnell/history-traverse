@@ -1,3 +1,2 @@
 1. Handle duplicates in the history list
-2. Use a different autocmd that won't call the adding function twice
-3. Add more autocmd based tests
+2. Add more autocmd based tests
