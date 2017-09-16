@@ -1,5 +1,4 @@
-" TODO: Make this guard useful
-if exists('g:history_traverse_loaded')
+if exists('g:history_traverse_loaded') || v:version < 700
   finish
 endif
 let g:history_traverse_loaded = 1

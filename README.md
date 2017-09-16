@@ -19,9 +19,9 @@ The default mappings are `<c-m>` to go back to the most previous buffer, and `<c
 " Put these in your .vimrc (all are optional):
 
 " Use this setting to override the default mapping (<c-m>) for going back in the history
-let g:history_back_map = '<c-m>'
+nmap <C-M> <Plug>HistoryTraverseGoBack
 " Use this setting to override the default mapping (<c-n>) for going forward in the history
-let g:history_forward_map = '<c-n>'
+nmap <C-N> <Plug>HistoryTraverseGoForward
 " Set filetypes to pass over putting in the history. Defaults to ['netrw']
 let g:history_ft_ignore = ['pyc', 'netrw']
 " Set the maximum length of each buffers history. Defaults to 100
