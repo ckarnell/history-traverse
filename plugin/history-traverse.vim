@@ -1,3 +1,23 @@
+function! BackHistoryIndicator() abort
+  if w:current_buffer_index != 0
+    return '←'
+  else
+    return ' '
+  end
+endfunction
+
+function! ForwardHistoryIndicator() abort
+  if w:current_buffer_index < (len(w:buffer_history_list) - 1)
+    return '→'
+  else
+    return ' '
+  end
+endfunction
+
+function! HistoryIndicator() abort
+  return BackHistoryIndicator() . ForwardHistoryIndicator()
+endfunction
+
 if exists('g:history_traverse_loaded') || v:version < 700
   finish
 endif

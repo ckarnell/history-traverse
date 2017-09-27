@@ -37,12 +37,10 @@ Install with your favorite package manager. For the sake of completion, I'll giv
 - Type `:PluginInstall`.
 - Restart whatever instances of vim you were using, and it should work.
 
-Append these to your status line wherever you like to get history indicators:
+Append this to your status line wherever you like to get history indicators:
 ```vim
-" Back history indicator:
-set statusline+=%{w:current_buffer_index!=0?'←':'\ '}
-" Forward history indicator:
-set statusline+=%{w:current_buffer_index<(len(w:buffer_history_list)-1)?'→':'\ '}
+" History indicator:
+set statusline+=%{HistoryIndicator}
 ```
 
 # Shameless begging for help
