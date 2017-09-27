@@ -20,12 +20,22 @@ The default mappings are `<c-m>` to go back to the most previous buffer, and `<c
 
 " Use this setting to override the default mapping (<c-m>) for going back in the history
 nmap <C-M> <Plug>HistoryTraverseGoBack
+
 " Use this setting to override the default mapping (<c-n>) for going forward in the history
 nmap <C-N> <Plug>HistoryTraverseGoForward
+
 " Set filetypes to pass over putting in the history. Defaults to ['netrw']
 let g:history_ft_ignore = ['pyc', 'netrw']
+
 " Set the maximum length of each buffers history. Defaults to 100
 let g:history_max_len = 1000
+
+" Define characters used for indicator
+let g:history_indicator_back_active      = '⬅'
+let g:history_indicator_back_inactive    = '⇦'
+let g:history_indicator_forward_active   = '➡'
+let g:history_indicator_forward_inactive = '⇨'
+let g:history_indicator_separator        = ' '
 ```
 
 # Installation
