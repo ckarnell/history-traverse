@@ -12,17 +12,15 @@ Each window (i.e. split) gets its own personal history, and each time you create
 
 # Usage
 
-The default mappings are `<c-m>` to go back to the most previous buffer, and `<c-n>` to go to the next. Both of these mappings can be easily changed. Note that the `<c-m>` default will also override your carriage return mapping so you'll want to change that if you use `<cr>` for something else.
+This plugin gives `:Back` and `:Forward` commands to navigate similarly to a web browser.
 
 # Settings
 ```vim
 " Put these in your .vimrc (all are optional):
 
-" Use this setting to override the default mapping (<c-m>) for going back in the history
-nmap <C-M> <Plug>HistoryTraverseGoBack
-
-" Use this setting to override the default mapping (<c-n>) for going forward in the history
-nmap <C-N> <Plug>HistoryTraverseGoForward
+" Mappings
+nnoremap <leader>n :Back<CR>
+nnoremap <leader>m :Forward<CR>
 
 " Set filetypes to pass over putting in the history. Defaults to ['netrw']
 let g:history_ft_ignore = ['pyc', 'netrw']
@@ -37,6 +35,7 @@ let g:history_indicator_forward_active   = '➡'
 let g:history_indicator_forward_inactive = '⇨'
 let g:history_indicator_separator        = ' '
 ```
+Note the indicator chars might look a little janky in your browser but should look okay in vim.
 
 # Installation
 Install with your favorite package manager. For the sake of completion, I'll give step by step instructions for installing with [vundle](https://github.com/VundleVim/Vundle.vim).

@@ -1,6 +1,7 @@
 if exists('g:history_traverse_loaded') || v:version < 700
   finish
 endif
+
 let g:history_traverse_loaded = 1
 
 " Global scope (user settings)
