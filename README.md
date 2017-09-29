@@ -12,15 +12,15 @@ Each window (i.e. split) gets its own personal history, and each time you create
 
 # Usage
 
-This plugin gives `:Back` and `:Forward` commands to navigate similarly to a web browser.
+This plugin gives `:HisTravBack` and `:HisTravForward` commands to navigate similarly to a web browser.
 
 # Settings
 ```vim
 " Put these in your .vimrc (all are optional):
 
-" Mappings
-nnoremap <leader>n :Back<CR>
-nnoremap <leader>m :Forward<CR>
+" Default mappings
+nnoremap <BS> :HisTravBack<CR>
+nnoremap <C-n> :HisTravForward<CR>
 
 " Set filetypes to pass over putting in the history. Defaults to ['netrw']
 let g:history_ft_ignore = ['pyc', 'netrw']
@@ -35,7 +35,7 @@ let g:history_indicator_forward_active   = '➡'
 let g:history_indicator_forward_inactive = '⇨'
 let g:history_indicator_separator        = ' '
 ```
-Note the indicator chars might look a little janky in your browser but should look okay in vim.
+Note the indicator chars might look a little janky in your browser but should look okay in terminal vim.
 
 # Installation
 Install with your favorite package manager. For the sake of completion, I'll give step by step instructions for installing with [vundle](https://github.com/VundleVim/Vundle.vim).
@@ -49,7 +49,7 @@ Install with your favorite package manager. For the sake of completion, I'll giv
 Append this to your status line wherever you like to get history indicators:
 ```vim
 " History indicator:
-set statusline+=%{HistoryIndicator}
+set statusline+=%{HistoryIndicator()}
 ```
 
 # Shameless begging for help
