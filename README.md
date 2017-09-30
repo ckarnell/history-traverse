@@ -54,3 +54,6 @@ Install with your favorite package manager. For the sake of completion, I'll giv
 
 # Shameless begging for help
 I don't really know how to make vim plugins so if you want to review my code, make suggestions about defaults or extensions, let me know about issues, help me make it more clear exactly what this plugin does in this README, or anything else, please go right ahead.
+
+# Thank you!
+Thanks to [drzl](https://github.com/drzel) for adding customization features for the indicators!
