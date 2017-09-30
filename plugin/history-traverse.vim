@@ -10,10 +10,19 @@ if !exists('g:history_max_len')     | let g:history_max_len = 100         | endi
 if !exists('g:history_back_map')    | let g:history_back_map = '<c-m>'    | endif
 if !exists('g:history_forward_map') | let g:history_forward_map = '<c-n>' | endif
 
-if !exists('g:history_indicator_back_active')      | let g:history_indicator_back_active      = '⬅' | endif
-if !exists('g:history_indicator_back_inactive')    | let g:history_indicator_back_inactive    = '⇦' | endif
-if !exists('g:history_indicator_forward_active')   | let g:history_indicator_forward_active   = '➡' | endif
-if !exists('g:history_indicator_forward_inactive') | let g:history_indicator_forward_inactive = '⇨' | endif
+if has('gui_running')
+  if !exists('g:history_indicator_back_active')      | let g:history_indicator_back_active      = '◀' | endif
+  if !exists('g:history_indicator_back_inactive')    | let g:history_indicator_back_inactive    = '◁' | endif
+  if !exists('g:history_indicator_forward_active')   | let g:history_indicator_forward_active   = '▶' | endif
+  if !exists('g:history_indicator_forward_inactive') | let g:history_indicator_forward_inactive = '▷' | endif
+else
+  if !exists('g:history_indicator_back_active')      | let g:history_indicator_back_active      = '⬅' | endif
+  if !exists('g:history_indicator_back_inactive')    | let g:history_indicator_back_inactive    = '⇦' | endif
+  if !exists('g:history_indicator_forward_active')   | let g:history_indicator_forward_active   = '➡' | endif
+  if !exists('g:history_indicator_forward_inactive') | let g:history_indicator_forward_inactive = '⇨' | endif
+  if !exists('g:history_indicator_separator')        | let g:history_indicator_separator        = ' ' | endif
+endif
+
 if !exists('g:history_indicator_separator')        | let g:history_indicator_separator        = ' ' | endif
 
 " Window scope
