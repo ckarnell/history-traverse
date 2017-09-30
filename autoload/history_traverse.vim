@@ -90,6 +90,26 @@ function! history_traverse#HistoryGoForward() abort
   let s:skip_add_buffer_history_list = 0
 endfunction
 
+function! BackHistoryIndicator() abort
+  if w:current_buffer_index != 0
+    return g:history_indicator_back_active
+  else
+    return g:history_indicator_back_inactive
+  end
+endfunction
+
+function! ForwardHistoryIndicator() abort
+  if w:current_buffer_index < (len(w:buffer_history_list) - 1)
+    return g:history_indicator_forward_active
+  else
+    return g:history_indicator_forward_inactive
+  end
+endfunction
+
+function! HistoryIndicator() abort
+  return BackHistoryIndicator() . g:history_indicator_separator . ForwardHistoryIndicator()
+endfunction
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Debugging utils
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
