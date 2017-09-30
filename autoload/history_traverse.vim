@@ -23,7 +23,6 @@ function! history_traverse#PersistLocalHistoryToScriptScope() abort
 endfunction
 
 " TODO: Take care of all duplicate cases
-" This function is agnostic to the current history index, and is idempotent
 function! history_traverse#AddToBufferHistoryList(buffer_name) abort
   " Cover the case where vim was launched without a buffer loaded
   if (!len(w:buffer_history_list) && w:current_buffer_index == 0)
@@ -36,6 +35,7 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
   endif
 
   " Slice the history list to start a new 'forward' history
+  " TODO: Preserve and expose the whole tree of history files
   let w:buffer_history_list = w:buffer_history_list[:w:current_buffer_index]
 
   " Finally, append the new name and increment the index value
@@ -93,17 +93,15 @@ endfunction
 function! BackHistoryIndicator() abort
   if w:current_buffer_index != 0
     return g:history_indicator_back_active
-  else
-    return g:history_indicator_back_inactive
-  end
+  endif
+  return g:history_indicator_back_inactive
 endfunction
 
 function! ForwardHistoryIndicator() abort
   if w:current_buffer_index < (len(w:buffer_history_list) - 1)
     return g:history_indicator_forward_active
-  else
-    return g:history_indicator_forward_inactive
-  end
+  endif
+  return g:history_indicator_forward_inactive
 endfunction
 
 function! HistoryIndicator() abort
