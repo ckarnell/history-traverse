@@ -45,6 +45,22 @@ Execute ('does not grow above the max history len value'):
   AssertEqual w:buffer_history_list, ['test_2', 'test_3']
   AssertEqual w:current_buffer_index, 1
 
+Execute ('does not add to the list if the input file is the same as the current buffer index'):
+  :let g:history_max_len = 100
+  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
+  :let w:current_buffer_index = 1
+  :call history_traverse#AddToBufferHistoryList('test_2')
+  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
+  AssertEqual w:current_buffer_index, 1
+
+Execute ('does not add to the list if the input file is the same as the next buffer index'):
+  :let g:history_max_len = 100
+  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
+  :let w:current_buffer_index = 1
+  :call history_traverse#AddToBufferHistoryList('test_3')
+  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
+  AssertEqual w:current_buffer_index, 2
+
 # Describe history_traverse#HistoryGoBack()
 Execute ('can go back from the end of the list'):
   :let g:history_max_len = 100
