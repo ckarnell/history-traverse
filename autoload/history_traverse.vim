@@ -22,12 +22,30 @@ function! history_traverse#PersistLocalHistoryToScriptScope() abort
   let s:current_buffer_index = w:current_buffer_index
 endfunction
 
-" TODO: Take care of all duplicate cases
 function! history_traverse#AddToBufferHistoryList(buffer_name) abort
+  let l:history_length = len(w:buffer_history_list)
   " Cover the case where vim was launched without a buffer loaded
-  if (!len(w:buffer_history_list) && w:current_buffer_index == 0)
+  if (!l:history_length && w:current_buffer_index == 0)
     let w:current_buffer_index = -1
   endif
+
+  " Cover the case where the input buffer is the same as the current buffer
+  " by simply returning without changing the state, avoiding a duplicate entry
+  if w:current_buffer_index > -1
+    if w:buffer_history_list[w:current_buffer_index] == a:buffer_name
+      return
+    endif
+  endif
+
+  " Cover the case where the input buffer is the same as the next buffer
+  " by advancing in the history list without destroying the rest of the history
+  if w:current_buffer_index < l:history_length - 1
+    if w:buffer_history_list[w:current_buffer_index + 1] == a:buffer_name
+      let w:current_buffer_index = w:current_buffer_index + 1
+      return
+    endif
+  endif
+
   " Don't add empty strings to the list, or add to the list at all
   " if the skip flag is set
   if (!len(a:buffer_name) || s:skip_add_buffer_history_list)
@@ -44,7 +62,7 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
 
   " If the list has become too long, chop off the beginning of it to meet the max length.
   " Note that this can't occur when the index is 0, avoiding an index error
-  if len(w:buffer_history_list) > g:history_max_len
+  if l:history_length + 1 > g:history_max_len
     let w:buffer_history_list = w:buffer_history_list[-g:history_max_len:]
     let w:current_buffer_index = w:current_buffer_index - 1
   endif

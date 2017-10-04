@@ -20,10 +20,11 @@ else
   if !exists('g:history_indicator_back_inactive')    | let g:history_indicator_back_inactive    = '⇦' | endif
   if !exists('g:history_indicator_forward_active')   | let g:history_indicator_forward_active   = '➡' | endif
   if !exists('g:history_indicator_forward_inactive') | let g:history_indicator_forward_inactive = '⇨' | endif
-  if !exists('g:history_indicator_separator')        | let g:history_indicator_separator        = ' ' | endif
 endif
 
-if !exists('g:history_indicator_separator')        | let g:history_indicator_separator        = ' ' | endif
+if !exists('g:history_indicator_separator')
+  let g:history_indicator_separator = ' ' 
+endif
 
 " Window scope
 let w:buffer_history_list = []
