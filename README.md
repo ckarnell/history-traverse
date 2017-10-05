@@ -17,7 +17,8 @@ This plugin provides `:HisTravBack` and `:HisTravForward` commands to navigate s
 ```vim
 " Put these in your .vimrc (all are optional):
 
-" Set mappings for the commands. This plugin doesn't set any mappings by default, but <BS> and <C-n> are recommended
+" Set mappings for the commands.
+" This plugin doesn't set any mappings by default, but <BS> and <C-n> are recommended
 nnoremap <BS> :HisTravBack<CR>
 nnoremap <C-n> :HisTravForward<CR>
 
