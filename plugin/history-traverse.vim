@@ -7,8 +7,6 @@ let g:history_traverse_loaded = 1
 " Global scope (user settings)
 if !exists('g:history_ft_ignore')   | let g:history_ft_ignore = ['netrw'] | endif
 if !exists('g:history_max_len')     | let g:history_max_len = 100         | endif
-if !exists('g:history_back_map')    | let g:history_back_map = '<c-m>'    | endif
-if !exists('g:history_forward_map') | let g:history_forward_map = '<c-n>' | endif
 
 if has('gui_running')
   if !exists('g:history_indicator_back_active')      | let g:history_indicator_back_active      = '◀' | endif
