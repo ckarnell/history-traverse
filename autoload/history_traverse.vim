@@ -1,3 +1,4 @@
+" Script scope
 let s:HISTORY_MESSAGE_ENUMS = {
       \   'NO_PREV_FILE': 'No previous file!',
       \   'NO_NEXT_FILE': 'No next file!',
@@ -5,13 +6,19 @@ let s:HISTORY_MESSAGE_ENUMS = {
 let s:skip_add_buffer_history_list = 0 " Boolean
 let s:bufwinenter_flag = 0
 let s:buffer_history_list = []
+let s:most_recent_list = []
 let s:current_buffer_index = 0
+
+function! WindowHasInitialEmptyState() abort
+  return w:buffer_history_list == []
+endfunction
 
 function! history_traverse#InitializeWindowSettings() abort
   if exists('w:window_created') |
     return
   endif
   let w:window_created = 1
+  let w:most_recent_list = s:most_recent_list
   let w:buffer_history_list = s:buffer_history_list
   let w:current_buffer_index = s:current_buffer_index
   let s:skip_add_buffer_history_list = 0
@@ -20,6 +27,7 @@ endfunction
 function! history_traverse#PersistLocalHistoryToScriptScope() abort
   let s:buffer_history_list = w:buffer_history_list
   let s:current_buffer_index = w:current_buffer_index
+  let s:most_recent_list = w:most_recent_list
 endfunction
 
 function! history_traverse#AddToBufferHistoryList(buffer_name) abort
@@ -27,6 +35,12 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
   " Cover the case where vim was launched without a buffer loaded
   if (!l:history_length && w:current_buffer_index == 0)
     let w:current_buffer_index = -1
+  endif
+
+  " Don't add empty strings to the list, or add to the list at all
+  " if the skip flag is set
+  if (!len(a:buffer_name) || s:skip_add_buffer_history_list)
+    return
   endif
 
   " Cover the case where the input buffer is the same as the current buffer
@@ -46,14 +60,7 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
     endif
   endif
 
-  " Don't add empty strings to the list, or add to the list at all
-  " if the skip flag is set
-  if (!len(a:buffer_name) || s:skip_add_buffer_history_list)
-    return
-  endif
-
   " Slice the history list to start a new 'forward' history
-  " TODO: Preserve and expose the whole tree of history files
   let w:buffer_history_list = w:buffer_history_list[:w:current_buffer_index]
 
   " Finally, append the new name and increment the index value
@@ -69,6 +76,18 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
 endfunction
 
 function! history_traverse#HistoryGoBack() abort
+  " If we're in an ignored filetype, make the history go back to the
+  " last non-ignored file
+  if index(g:history_ft_ignore, &filetype) != -1
+    if WindowHasInitialEmptyState()
+      echo s:HISTORY_MESSAGE_ENUMS['NO_PREV_FILE']
+      return
+    else
+      execute ':e ' . w:buffer_history_list[w:current_buffer_index]
+    endif
+    return
+  endif
+
   " Skip if we're at the head of the list
   if len(w:buffer_history_list) <= 1 || w:current_buffer_index == 0
     echo s:HISTORY_MESSAGE_ENUMS['NO_PREV_FILE']
@@ -86,7 +105,7 @@ endfunction
 
 function! history_traverse#HistoryGoForward() abort
   " Skip if vim has just been launched with no buffer loaded
-  if !len(w:buffer_history_list)
+  if WindowHasInitialEmptyState()
     echo s:HISTORY_MESSAGE_ENUMS['NO_NEXT_FILE']
     return
   endif
@@ -109,7 +128,7 @@ function! history_traverse#HistoryGoForward() abort
 endfunction
 
 function! BackHistoryIndicator() abort
-  if w:current_buffer_index != 0
+  if w:current_buffer_index > 0
     return g:history_indicator_back_active
   endif
   return g:history_indicator_back_inactive

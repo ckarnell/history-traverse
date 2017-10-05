@@ -93,6 +93,26 @@ Execute ('does not go back when a new instance of vim is launched with no buffer
   AssertEqual w:buffer_history_list, []
   AssertEqual w:current_buffer_index, 0
 
+Execute ('goes back when in a skipped filetype and the window is in a non-initial state'):
+  :let g:history_max_len = 100
+  :let w:buffer_history_list = ['test_1', expand('%:p'), 'test_3']
+  :let g:history_ft_ignore = ['netrw']
+  :let w:current_buffer_index = 1
+  :Explore
+  :silent call history_traverse#HistoryGoBack()
+  AssertEqual w:buffer_history_list, ['test_1', expand('%:p'), 'test_3']
+  AssertEqual w:current_buffer_index, 1
+
+Execute ('does not go back when in a skipped filetype and the window is in the initial state'):
+  :let g:history_max_len = 100
+  :let w:buffer_history_list = []
+  :let w:current_buffer_index = 0
+  :let g:history_ft_ignore = ['netrw']
+  :Explore
+  :silent call history_traverse#HistoryGoBack()
+  AssertEqual w:buffer_history_list, []
+  AssertEqual w:current_buffer_index, 0
+
 # Describe HistoryGoForward()
 Execute ('does not go forward when the index is at the head of the list'):
   :let g:history_max_len = 100

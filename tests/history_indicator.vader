@@ -10,6 +10,9 @@ Execute ('returns the expected history indicators in the initial empty state'):
   :let b:expected_indicator = b:expected_indicator . g:history_indicator_forward_inactive
   :let b:actual_indicator = HistoryIndicator()
   AssertEqual b:actual_indicator, b:expected_indicator
+  :let w:current_buffer_index = -1
+  :let b:actual_indicator = HistoryIndicator()
+  AssertEqual b:actual_indicator, b:expected_indicator
 
 Execute ('returns expected history indicators while at the head of the non-empty history'):
   :let g:history_max_len = 100
