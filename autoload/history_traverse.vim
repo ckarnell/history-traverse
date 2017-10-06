@@ -6,7 +6,6 @@ let s:HISTORY_MESSAGE_ENUMS = {
 let s:skip_add_buffer_history_list = 0 " Boolean
 let s:bufwinenter_flag = 0
 let s:buffer_history_list = []
-let s:most_recent_list = []
 let s:current_buffer_index = 0
 
 function! WindowHasInitialEmptyState() abort

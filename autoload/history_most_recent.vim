@@ -1,23 +1,30 @@
-function! history_most_recent#AddToMostRecentList(buffer_name) abort
-  let b:recent_ind = index(w:most_recent_list, a:buffer_name)
+let s:most_recent_list = []
 
-  " Slice off the existing element
-  if b:recent_ind > 0
-    let w:most_recent_list = w:most_recent_list[:b:recent_ind-1] + w:most_recent_list[b:recent_ind+1:]
-  elseif b:recent_ind == 0
-    let w:most_recent_list = w:most_recent_list[1:b:recent_ind-1]
+function! history_most_recent#AddToMostRecentList(buffer_name, line, col) abort
+  if index(g:history_ft_ignore, &filetype) != -1 || len(a:buffer_name) == 0
+    return
   endif
 
-  if len(w:most_recent_list) + 1 > g:history_mr_max_len
-    let w:most_recent_list = w:most_recent_list[-g:history_mr_max_len:]
-  endif
-
-  call add(w:most_recent_list, a:buffer_name)
+  let l:mr_dict = {'filename': a:buffer_name, 'col': a:col, 'lnum': a:line}
+  call add(w:most_recent_list, l:mr_dict)
 endfunction
 
-function! history_most_recent#HistoryLocalList() abort
-  let b:recent_copy = copy(w:most_recent_list)
-  call reverse(b:recent_copy)
-  call setloclist(0, map(b:recent_copy, {_, file -> {'filename': file}}))
-  lopen
+function! DeleteDuplicateFilenames(mr_list) abort
+  let b:most_recent_copy = deepcopy(w:most_recent_list)
+  call reverse(b:most_recent_copy)
+  let l:used_filenames = []
+  let l:return_list = []
+  for l:element in b:most_recent_copy
+    if index(l:used_filenames, l:element['filename']) == -1
+      call add(l:used_filenames, l:element['filename'])
+      call add(l:return_list, l:element)
+    endif
+  endfor
+  return l:return_list
+endfunction
+
+function! history_most_recent#RecentHistorySelect() abort
+  let w:most_recent_list = reverse(DeleteDuplicateFilenames(w:most_recent_list))
+  call setqflist(w:most_recent_list)
+  copen
 endfunction
