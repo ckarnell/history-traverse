@@ -6,9 +6,11 @@ endif
 let g:history_traverse_loaded = 1
 
 " Global scope (user settings)
-if !exists('g:history_ft_ignore')   | let g:history_ft_ignore = ['netrw'] | endif
-if !exists('g:history_max_len')     | let g:history_max_len = 100         | endif
-if !exists('g:history_mr_max_len')  | let g:history_mr_max_len = 100      | endif
+if !exists('g:history_ft_ignore')     | let g:history_ft_ignore = ['netrw']  | endif
+if !exists('g:history_max_len')       | let g:history_max_len = 100          | endif
+if !exists('g:history_mr_max_len')    | let g:history_mr_max_len = 100       | endif
+if !exists('g:history_mr_use_loc')    | let g:history_mr_use_loc = 0         | endif
+if !exists('g:history_mr_auto_open')  | let g:history_mr_auto_open = 0       | endif
 
 if has('gui_running')
   if !exists('g:history_indicator_back_active')      | let g:history_indicator_back_active      = '◀' | endif

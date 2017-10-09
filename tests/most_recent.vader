@@ -1,0 +1,30 @@
+# With the vader plugin installed, type ":Vader %" to run these tests
+
+" Describe history_most_recent#RecentHistorySelect()
+Execute ('populates an empty quickfix list in an empty state with nothing'):
+  :let g:history_mr_auto_open = 0
+  " Dirty the qflist
+  :let qflist = setqflist([{'lnum': 1, 'col': 1, 'filename': 'test_file'}])
+  :let w:most_recent_list = []
+  :call history_most_recent#RecentHistorySelect()
+  :let qflist = getqflist()
+  AssertEqual qflist, []
+
+Execute ('populates a full qflist when the most recent list has one entry'):
+  " Dirty the qflist
+  :let g:history_mr_auto_open = 0
+  :let qflist = setqflist([])
+  :let w:most_recent_list = [{'lnum': 2, 'col': 2, 'filename': 'random_name'}]
+  :call history_most_recent#RecentHistorySelect()
+  :echo getqflist()
+  :let qflist = getqflist()
+  AssertEqual qflist, [{'lnum': 2, 'col': 2, 'bufnr': bufnr('%') + 2, 'valid': 1, 'vcol': 0, 'nr': 0, 'type': '', 'text': '', 'pattern': ''}]
+
+Execute ('populates a full qflist with a reversed version of the most recent list'):
+  :let g:history_mr_auto_open = 0
+  :let qflist = setqflist([])
+  :let w:most_recent_list = [{'lnum': 2, 'col': 2, 'filename': 'random_name'}, {'lnum': 5, 'col': 5, 'filename': 'another_random_name'}]
+  :call history_most_recent#RecentHistorySelect()
+  :echo getqflist()
+  :let qflist = getqflist()
+  AssertEqual qflist, [{'lnum': 2, 'col': 2, 'bufnr': bufnr('%') + 2, 'valid': 1, 'vcol': 0, 'nr': 0, 'type': '', 'text': '', 'pattern': ''}]

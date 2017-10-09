@@ -20,11 +20,20 @@ function! DeleteDuplicateFilenames(mr_list) abort
       call add(l:return_list, l:element)
     endif
   endfor
-  return l:return_list
+  return reverse(l:return_list)
 endfunction
 
 function! history_most_recent#RecentHistorySelect() abort
-  let w:most_recent_list = reverse(DeleteDuplicateFilenames(w:most_recent_list))
-  call setqflist(w:most_recent_list)
-  copen
+  let w:most_recent_list = DeleteDuplicateFilenames(w:most_recent_list)
+  if g:history_mr_use_loc != 1
+      call setqflist(w:most_recent_list)
+      if g:history_mr_auto_open == 1
+          copen
+      endif
+  else
+      call setloclist(w:most_recent_list)
+      if g:history_mr_auto_open == 1
+          lopen
+      endif
+  endif
 endfunction
