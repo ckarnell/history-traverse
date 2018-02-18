@@ -17,6 +17,6 @@ augroup history_group
   " Command window specific (fixes an error when you press <c-f> in command mode)
   autocmd! CmdwinEnter * call history_traverse#InitializeWindowSettings()
 
-  autocmd! BufWinEnter * if index(g:history_ft_ignore, &ft) < 0 |
+  autocmd! BufWinEnter * if index(g:history_ft_ignore, &ft) < 0 && index(g:history_fn_ignore, expand('%:t')) < 0 |
         \ call history_traverse#AddToBufferHistoryList(expand('%:p'))
 augroup END
