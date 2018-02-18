@@ -128,6 +128,7 @@ Before (in the middle of the history list with three files):
   redir END
   let g:history_max_len = 100
   let g:test_messages = ''
+  let g:history_fn_ignore = ['file_to_ignore.extension']
   let w:buffer_history_list = []
   let w:current_buffer_index = 0
   edit test_1
@@ -173,3 +174,18 @@ Execute (go forward when the index is too high):
 Then (resets the state of the index):
   AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_3'], 'expand("%:p:h") . v:val')
   AssertEqual expand('%:p'), w:buffer_history_list[1]
+
+Execute (go to a buffer on the file ignore list):
+  edit file_to_ignore.extension
+
+Then (goes to the file but doesn\'t add it to the history list):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_3'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), expand('%:p:h') . '/file_to_ignore.extension'
+
+Execute (go to a buffer on the file ignore list, then go to a new file):
+  edit file_to_ignore.extension
+  edit test_4
+
+Then (goes to the new file and cuts the end off of the remaining history list):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_4'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), w:buffer_history_list[2]

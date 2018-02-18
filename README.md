@@ -25,6 +25,9 @@ nnoremap <C-n> :HisTravForward<CR>
 " Set filetypes to pass over putting in the history. Defaults to ['netrw']
 let g:history_ft_ignore = ['pyc', 'netrw']
 
+" Set file names to pass over putting in the history. Defaults to an empty list
+let g:history_fn_ignore = ['hate_this_file.py', 'worst_file']
+
 " Set the maximum length of each buffer's history. Defaults to 100
 let g:history_max_len = 1000
 
