@@ -1,127 +1,175 @@
-# With the vader plugin installed, type ":Vader %" to run these tests
+# With the vader plugin installed, type "vim '+Vader!autoload_functions*' && echo Success || echo Failure" to run these tests
 
-# Describe history_traverse#AddToBufferHistoryList()
-Execute ('can add to the history list when it is empty'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = []
-  :call history_traverse#AddToBufferHistoryList('test_string')
-  AssertEqual w:buffer_history_list, ['test_string']
+Before (when the history list is empty):
+  redir => g:no_next_file_message
+  echo 'No next file!'
+  redir END
+  redir => g:no_prev_file_message
+  echo 'No previous file!'
+  redir END
+  let g:history_max_len = 100
+  let w:current_buffer_index = 0
+  let w:buffer_history_list = []
 
-Execute ('can add to the history list when it is not empty'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1']
-  :call history_traverse#AddToBufferHistoryList('test_string')
-  AssertEqual w:buffer_history_list, ['test_1', 'test_string']
+Execute (enter a new named file without a history list):
+  edit new_file
 
-Execute ('does not add an empty string to the history list'):
-  :let g:skip_bufenter_autocmd = 0
-  :let g:history_max_len = 100
-  :let g:buffer_history_list = ['test_in']
-  :call history_traverse#AddToBufferHistoryList('')
-  AssertEqual g:buffer_history_list, ['test_in']
+Then (a new file was added to the history list):
+  AssertEqual expand('%:t'), 'new_file'
+  AssertEqual w:buffer_history_list, [expand('%:p:h') . '/new_file']
 
-Execute ('increments the current buffer index when the buffer history list gets bigger'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3']
-  :let w:current_buffer_index = 2
-  :call history_traverse#AddToBufferHistoryList('test_4')
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 3
-  :let w:current_buffer_index = 0
+Execute (enter a new unnamed file):
+  let g:skip_bufenter_autocmd = 0
+  enew
 
-Execute ('chops off the end of the list if the current buffer index is not on the end'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 1
-  :call history_traverse#AddToBufferHistoryList('test_5')
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_5']
-  AssertEqual w:current_buffer_index, 2
+Then (does not add an empty string to the history list):
+  " We're now in a buffer with no name
+  AssertEqual expand('%:t'), ''
+  AssertEqual w:buffer_history_list, []
 
-Execute ('does not grow above the max history len value'):
-  :let g:history_max_len = 2
-  :let w:buffer_history_list = ['test_1', 'test_2']
-  :let w:current_buffer_index = 1
-  :call history_traverse#AddToBufferHistoryList('test_3')
-  AssertEqual w:buffer_history_list, ['test_2', 'test_3']
-  AssertEqual w:current_buffer_index, 1
+Execute (attempt to go back when at the start of the history list):
+  redir => g:test_messages
+  HisTravBack
+  redir END
 
-Execute ('does not add to the list if the input file is the same as the current buffer index'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 1
-  :call history_traverse#AddToBufferHistoryList('test_2')
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 1
-
-Execute ('does not add to the list if the input file is the same as the next buffer index'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 1
-  :call history_traverse#AddToBufferHistoryList('test_3')
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 2
-
-# Describe history_traverse#HistoryGoBack()
-Execute ('can go back from the end of the list'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 3
-  :silent call history_traverse#HistoryGoBack()
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 2
-
-Execute ('does not go back when the index is 0'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 0
-  :silent call history_traverse#HistoryGoBack()
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 0
-
-Execute ('does not decrement the index when the history list only has one entry'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1']
-  :let w:current_buffer_index = 0
-  :silent call history_traverse#HistoryGoBack()
-  AssertEqual w:buffer_history_list, ['test_1']
-
-Execute ('does not go back when a new instance of vim is launched with no buffer loaded'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = []
-  :let w:current_buffer_index = 0
-  :silent call history_traverse#HistoryGoBack()
+Then (does not go back and emits a message):
   AssertEqual w:buffer_history_list, []
   AssertEqual w:current_buffer_index, 0
+  AssertEqual g:test_messages, g:no_prev_file_message
 
-# Describe HistoryGoForward()
-Execute ('does not go forward when the index is at the head of the list'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 3
-  :silent call history_traverse#HistoryGoForward()
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 3
+Execute (attempt to go back when a new instance of vim is launched with no buffer loaded):
+  redir => g:test_messages
+  HisTravBack
+  redir END
 
-Execute ('increments the index when it is not at the head of the list'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 2
-  :silent call history_traverse#HistoryGoForward()
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 3
-
-Execute ('resets the state of the index when it is too high'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = ['test_1', 'test_2', 'test_3', 'test_4']
-  :let w:current_buffer_index = 100
-  :silent call history_traverse#HistoryGoForward()
-  AssertEqual w:buffer_history_list, ['test_1', 'test_2', 'test_3', 'test_4']
-  AssertEqual w:current_buffer_index, 3
-
-Execute ('does not go forward when a new instance of vim is launched with no buffer loaded'):
-  :let g:history_max_len = 100
-  :let w:buffer_history_list = []
-  :let w:current_buffer_index = 0
-  :silent call history_traverse#HistoryGoForward()
+Then (does not go back and emits a message):
   AssertEqual w:buffer_history_list, []
   AssertEqual w:current_buffer_index, 0
+  AssertEqual g:test_messages, g:no_prev_file_message
+
+Execute (attempt to go forward when a new instance of vim is launched with no buffer loaded):
+  redir => g:test_messages
+  HisTravForward
+  redir END
+
+Then (does not go forward and emits a message):
+  AssertEqual w:buffer_history_list, []
+  AssertEqual w:current_buffer_index, 0
+  AssertEqual g:test_messages, g:no_next_file_message
+
+Before (at the end of the history list with one file):
+  redir => g:no_next_file_message
+  echo 'No next file!'
+  redir END
+  let g:history_max_len = 100
+  let g:test_messages = ''
+  let w:buffer_history_list = []
+  let w:current_buffer_index = 0
+  edit test_1
+
+Execute (attempt to go back when the history list only has one entry):
+  redir => g:test_messages
+  HisTravBack
+  redir END
+
+Then (does not go back and emits a message):
+  AssertEqual w:buffer_history_list, [expand('%:p:h') . '/test_1']
+  AssertEqual g:test_messages, g:no_prev_file_message
+
+Before (at the end of the history list with multiple files):
+  redir => g:no_next_file_message
+  echo 'No next file!'
+  redir END
+  let g:history_max_len = 100
+  let g:test_messages = ''
+  let w:buffer_history_list = []
+  let w:current_buffer_index = 0
+  edit test_1
+  edit test_2
+
+Execute (enter a new unnamed file with a history list):
+  enew
+
+Then (does not add an empty string to the history list):
+  " We're now in a new buffer with no name
+  AssertEqual expand('%:t'), ''
+  " Nothing was added to the list
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2'], 'expand("%:p:h") . v:val')
+
+Execute (attempt to go forward while at the end of the history list):
+  redir => g:test_messages
+  HisTravForward
+  redir END
+
+Then (does not go forward and emits a message):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2'], 'expand("%:p:h") . v:val')
+  let g:assert_messages = ''
+  AssertEqual w:current_buffer_index, 1
+  AssertEqual g:test_messages, g:no_next_file_message
+
+Execute (attempt to go back while at the end of the history list):
+  HisTravBack
+
+Then (goes back and does not add to the history list):
+  AssertEqual expand('%:p'), expand('%:p:h') . '/test_1'
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2'], 'expand("%:p:h") . v:val')
+
+Execute (open a new file when the history list is full):
+  let g:history_max_len = 2
+  edit test_3
+
+Then (removes the first element and adds a new element to the end of the history list):
+  AssertEqual w:buffer_history_list, map(['/test_2', '/test_3'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), w:buffer_history_list[1]
+
+Before (in the middle of the history list with three files):
+  redir => g:no_next_file_message
+  echo 'No next file!'
+  redir END
+  let g:history_max_len = 100
+  let g:test_messages = ''
+  let w:buffer_history_list = []
+  let w:current_buffer_index = 0
+  edit test_1
+  edit test_2
+  edit test_3
+  HisTravBack
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_3'], 'expand("%:p:h") . v:val')
+
+Execute (go to a new buffer when in the middle of the history list):
+  edit test_4
+
+Then (chops off the end of the list and adds a new file):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_4'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), w:buffer_history_list[2]
+
+Execute (manually open the current file in the history list):
+  let w:current_buffer_index = 1
+  edit test_2
+
+Then (does not add to the history list):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_3'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), w:buffer_history_list[1]
+
+Execute (manually open the next file in the history list):
+  let w:current_buffer_index = 1
+  edit test_3
+
+Then (does not add to the history list):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_3'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), w:buffer_history_list[2]
+
+Execute (go forward when not at the head of the list):
+  HisTravForward
+
+Then (goes forward and does not add to the history list):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_3'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), w:buffer_history_list[2]
+
+Execute (go forward when the index is too high):
+  let w:current_buffer_index = 100
+  HisTravForward
+
+Then (resets the state of the index):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_3'], 'expand("%:p:h") . v:val')
+  AssertEqual expand('%:p'), w:buffer_history_list[1]

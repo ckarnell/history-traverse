@@ -29,6 +29,12 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
     let w:current_buffer_index = -1
   endif
 
+  " Don't add empty strings to the list, or add to the list at all
+  " if the skip flag is set
+  if (!len(a:buffer_name) || s:skip_add_buffer_history_list)
+    return
+  endif
+
   " Cover the case where the input buffer is the same as the current buffer
   " by simply returning without changing the state, avoiding a duplicate entry
   if w:current_buffer_index > -1
@@ -44,12 +50,6 @@ function! history_traverse#AddToBufferHistoryList(buffer_name) abort
       let w:current_buffer_index = w:current_buffer_index + 1
       return
     endif
-  endif
-
-  " Don't add empty strings to the list, or add to the list at all
-  " if the skip flag is set
-  if (!len(a:buffer_name) || s:skip_add_buffer_history_list)
-    return
   endif
 
   " Slice the history list to start a new 'forward' history
