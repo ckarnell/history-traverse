@@ -19,7 +19,6 @@ Then (a new file was added to the history list):
   AssertEqual w:buffer_history_list, [expand('%:p:h') . '/new_file']
 
 Execute (enter a new unnamed file):
-  let g:skip_bufenter_autocmd = 0
   enew
 
 Then (does not add an empty string to the history list):
