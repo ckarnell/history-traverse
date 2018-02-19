@@ -1,40 +1,50 @@
-# With the vader plugin installed, type ":Vader %" to run these tests
+# With the vader plugin installed, type "vim '+Vader!history_indicator.vader' && echo Success || echo Failure" to run these tests
 
-# Describe history_traverse#HistoryIndicator()
-Execute ('returns the expected history indicators in the initial empty state'):
+Before (HistoryIndicator in initial empty state):
   let g:history_max_len = 100
   let w:buffer_history_list = []
   let w:current_buffer_index = 0
+
+Execute (in the initial empty state initial empty state):
+  " Nothing to do
+
+Then (it returns back inactive and forward inactive indicators):
   let b:expected_indicator = g:history_indicator_back_inactive 
   let b:expected_indicator = b:expected_indicator . g:history_indicator_separator
   let b:expected_indicator = b:expected_indicator . g:history_indicator_forward_inactive
   let b:actual_indicator = HistoryIndicator()
   AssertEqual b:actual_indicator, b:expected_indicator
 
-Execute ('returns expected history indicators while at the head of the non-empty history'):
-  let g:history_max_len = 100
-  let w:buffer_history_list = ['test_filename1', 'test_filename2']
-  let w:current_buffer_index = 1
+Execute (at the head of the non-empty history):
+  edit test_1
+  edit test_2
+
+Then (it returns back active and forward inactive indicators):
   let b:expected_indicator = g:history_indicator_back_active 
   let b:expected_indicator = b:expected_indicator . g:history_indicator_separator
   let b:expected_indicator = b:expected_indicator . g:history_indicator_forward_inactive
   let b:actual_indicator = HistoryIndicator()
   AssertEqual b:actual_indicator, b:expected_indicator
 
-Execute ('returns expected history indicators while at the tail of the non-empty history'):
-  let g:history_max_len = 100
-  let w:buffer_history_list = ['test_filename1', 'test_filename2']
-  let w:current_buffer_index = 0
+Execute (at the beginning of the non-empty history):
+  edit test_1
+  edit test_2
+  HisTravBack
+
+Then (it returns back inactive and forward active indicators):
   let b:expected_indicator = g:history_indicator_back_inactive 
   let b:expected_indicator = b:expected_indicator . g:history_indicator_separator
   let b:expected_indicator = b:expected_indicator . g:history_indicator_forward_active
   let b:actual_indicator = HistoryIndicator()
   AssertEqual b:actual_indicator, b:expected_indicator
 
-Execute ('returns expected history indicators while in the middle of the non-empty history'):
-  let g:history_max_len = 100
-  let w:buffer_history_list = ['test_filename1', 'test_filename2', 'test_filename3']
-  let w:current_buffer_index = 1
+Execute (in the middle of the non-empty history):
+  edit test_1
+  edit test_2
+  edit test_3
+  HisTravBack
+
+Then (it returns back active and forward active indicators):
   let b:expected_indicator = g:history_indicator_back_active 
   let b:expected_indicator = b:expected_indicator . g:history_indicator_separator
   let b:expected_indicator = b:expected_indicator . g:history_indicator_forward_active
