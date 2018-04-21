@@ -75,6 +75,13 @@ function! history_traverse#HistoryGoBack() abort
     return
   endif
 
+  " Don't decrement the index if we're in a file that isn't in the history list
+  if index(g:history_ft_ignore, &filetype) >= 0 || index(g:history_fn_ignore, expand('%:t')) >= 0
+    let s:skip_add_buffer_history_list = 1
+    execute ':e ' . w:buffer_history_list[w:current_buffer_index]
+    return
+  endif
+
   " Decrement the history index
   let w:current_buffer_index = w:current_buffer_index - 1
   " Set a flag to prevent the autocmd from adding this buffer to the history list
