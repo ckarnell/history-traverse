@@ -23,6 +23,14 @@ function! history_traverse#PersistLocalHistoryToScriptScope() abort
 endfunction
 
 function! history_traverse#AddToBufferHistoryList(buffer_name) abort
+  if !exists("w:buffer_history_list")
+    let w:buffer_history_list=[]
+  endif
+
+  if !exists("w:current_buffer_index")
+    let w:current_buffer_index=0
+  endif
+
   let l:history_length = len(w:buffer_history_list)
   " Cover the case where vim was launched without a buffer loaded
   if (!l:history_length && w:current_buffer_index == 0)
