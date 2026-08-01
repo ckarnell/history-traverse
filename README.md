@@ -1,13 +1,6 @@
 # history-traverse.vim
 Easily go back and forth in your buffer history in vim, similar to the behavior of a browser. You even get little tiny arrows to put in your statusline to indicate when you can go back or forward (if you want them)!
 
-
-:sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles:
-![Alt Text](http://g.recordit.co/57fvVbiwZ0.gif)
-:sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles::sparkles:
-
-<sup><i>Look at the majesty of those little arrows!</i></sup>
-
 Each window (i.e. split) gets its own personal history, and each time you create a new window or a new tab, it inherits its history from the previous buffer (both forward and backward).
 # Usage
 
