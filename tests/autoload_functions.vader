@@ -188,3 +188,32 @@ Execute (go to a buffer on the file ignore list, then go to a new file):
 Then (goes to the new file and cuts the end off of the remaining history list):
   AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_4'], 'expand("%:p:h") . v:val')
   AssertEqual expand('%:p'), w:buffer_history_list[2]
+
+Execute (go back while in a buffer on the file ignore list, then go to a new file):
+  edit file_to_ignore.extension
+  HisTravBack
+  edit test_4
+
+Then (still records the new file in the history list):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_2', '/test_4'], 'expand("%:p:h") . v:val')
+  AssertEqual w:current_buffer_index, 2
+  AssertEqual expand('%:p'), w:buffer_history_list[2]
+
+Execute (open a new file from the middle of a full history list):
+  let g:history_max_len = 3
+  HisTravBack
+  edit test_4
+
+Then (starts a new forward history without wiping out the list):
+  AssertEqual w:buffer_history_list, map(['/test_1', '/test_4'], 'expand("%:p:h") . v:val')
+  AssertEqual w:current_buffer_index, 1
+  AssertEqual expand('%:p'), w:buffer_history_list[1]
+
+Execute (navigate back to a file with special characters in its name):
+  edit test\ file\ 5
+  HisTravBack
+  HisTravForward
+
+Then (goes back and forward to the file with spaces in its name):
+  AssertEqual expand('%:t'), 'test file 5'
+  AssertEqual w:buffer_history_list[-1], expand('%:p:h') . '/test file 5'
